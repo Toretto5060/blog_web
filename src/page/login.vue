@@ -1,5 +1,5 @@
 <template>
-  <div class="hello">
+  <div class="hello" v-if="loginShow">
      <vue-particles
         color="#dedede"
         :particleOpacity="0.7"
@@ -43,8 +43,7 @@
 </template>
 
 <script>
-import {loginIn,checkUser,registerUser,tast} from '../api/index.js';
-import store from '../vuex/store'
+import {loginIn,checkUser,registerUser,tast,checkLogin} from '../api/index.js';
 
 export default {
   name: 'login',
@@ -112,7 +111,8 @@ export default {
         user:[{validator:checkUserName,trigger: 'blur'}],
         psw:[{validator: pswRule, trigger: 'blur'}],
         checkPsw:[{validator: pswRule2, trigger: 'change'}]
-      }
+      },
+      loginShow:true
     }
   },
   watch:{
@@ -133,7 +133,7 @@ export default {
     }
   },
   mounted () {
-
+    this.checkLogin()
   },
   methods:{
     loginMessages(){
@@ -154,6 +154,17 @@ export default {
         that.btnReq(data);
       }
     },
+    checkLogin(){
+      if (localStorage.getItem('token') != '') {
+        checkLogin().then(res=>{
+          if (res.code > -1) {
+            let that = this
+            that.loginShow = false
+            that.$router.push({path:'/home'})
+          }
+        })
+      }
+    },
     btnLogin(formData){
       let that = this;
       that.$refs[formData].validate((valid) => {
@@ -161,10 +172,15 @@ export default {
         if (valid) {
           loginIn(that.input).then(res=>{
             if(res.code == 0){
-              localStorage.setItem('token',res.token);
-              store.state.token = localStorage.getItem('token');
-              console.log(res)
-              // console.log(store.state.token)
+              // that.$store.state.token = res.data.token
+              // that.$store.state.user_id = res.data.id
+              localStorage.setItem('token',res.data.token)
+              localStorage.setItem('user_id',res.data.id)
+              if (res.data.post_position == '' && res.data.area == '') {
+                that.$router.push({path:'/editUserDetails'})
+              } else {
+                that.$router.push({path:'/home'})
+              }
             }else{
               console.log(res.message)
             }
@@ -199,7 +215,7 @@ export default {
               that.loading = false;
               if(res.status == 200){
                 that.isRegister = false;
-                that.$message.error(res.message)
+                that.$message.success(res.message)
                 console.log(res)
               }else{
                 that.$message.error(res.message)

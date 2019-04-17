@@ -23,10 +23,17 @@ export default {
     }
   },
   mounted () {
-    
+
   },
   watch:{
-   
+
+  },
+  beforeRouteLeave(to, from, next){
+    if(to.name ==='login' ){
+      window.opener=null;
+      window.close();
+      window.open('',self);
+    }
   },
   methods:{
     btnLogin(){
@@ -40,7 +47,7 @@ export default {
         }else{
           console.log(res.message)
         }
-        
+
       })
     },
     btnReq(){

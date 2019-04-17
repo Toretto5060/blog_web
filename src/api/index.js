@@ -6,3 +6,4 @@ export const registerUser = params => {return axiosIns.post("" + host + "registe
 export const checkUser = params => {return axiosIns.post("" + host + "checkUser", params)}
 export const loginIn = params => {return axiosIns.post("" + host + "login", params)}
 export const tast = params => { return axiosIns.get("" + host + "tast", params)}
+export const checkLogin = params => { return axiosIns.get("" + host + "checkLogin", params)}
