@@ -112,7 +112,7 @@ export default {
         psw:[{validator: pswRule, trigger: 'blur'}],
         checkPsw:[{validator: pswRule2, trigger: 'change'}]
       },
-      loginShow:true
+      loginShow:false
     }
   },
   watch:{
@@ -163,6 +163,8 @@ export default {
             that.$router.push({path:'/home'})
           }
         })
+      } else {
+        that.loginShow = true
       }
     },
     btnLogin(formData){
