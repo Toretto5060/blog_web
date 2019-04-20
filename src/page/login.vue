@@ -155,10 +155,10 @@ export default {
       }
     },
     checkLogin(){
+      let that = this
       if (localStorage.getItem('token') != '' && localStorage.getItem('token') != null) {
         checkLogin().then(res=>{
           if (res.code > -1) {
-            let that = this
             that.loginShow = false
             that.$router.push({path:'/home'})
           }
