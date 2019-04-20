@@ -155,6 +155,7 @@ export default {
       }
     },
     checkLogin(){
+      let that = this
       if (localStorage.getItem('token') != '' && localStorage.getItem('token') != null) {
         checkLogin().then(res=>{
           if (res.code > -1) {
