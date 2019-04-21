@@ -161,7 +161,12 @@ export default {
           if (res.code > -1) {
             that.loginShow = false
             that.$router.push({path:'/home'})
+          } else {
+            that.loginShow = true
           }
+        })
+        .catch(err => {
+          that.loginShow = true
         })
       } else {
         that.loginShow = true
@@ -174,8 +179,6 @@ export default {
         if (valid) {
           loginIn(that.input).then(res=>{
             if(res.code == 0){
-              // that.$store.state.token = res.data.token
-              // that.$store.state.user_id = res.data.id
               localStorage.setItem('token',res.data.token)
               localStorage.setItem('user_id',res.data.id)
               if (res.data.post_position == '' && res.data.area == '') {
@@ -192,19 +195,6 @@ export default {
           return false;
         }
       });
-      // if(that.input.user == "" || that.input.psw == ""){
-      //   return;
-      // }
-      // loginIn(that.input).then(res=>{
-      //   if(res.code == 0){
-      //     localStorage.setItem('token',res.token);
-      //     store.state.token = localStorage.getItem('token');
-      //     console.log(res)
-      //     // console.log(store.state.token)
-      //   }else{
-      //     console.log(res.message)
-      //   }
-      // })
     },
     btnReq(formData){
       let that = this;
