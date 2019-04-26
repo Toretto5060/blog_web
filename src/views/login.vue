@@ -6,7 +6,12 @@
           <at-tabs>
             <at-tab-pane label="账号登录" name="name1">
               <div class="userTab">
-                <at-input v-model="userName" placeholder="手机号/邮箱/用户名">
+                <at-input
+                  v-model="userName"
+                  placeholder="手机号/邮箱/用户名"
+                  :status="loginStatus"
+                  :icon="loginIcon"
+                >
                   <template slot="prepend">
                     <i class="icon icon-user"></i>
                   </template>
@@ -15,25 +20,29 @@
                   v-model="password"
                   placeholder="密码"
                   :type="loginEyes"
+                  :status="loginStatus"
+                  :icon="loginClsaa"
                 >
                   <template slot="prepend">
                     <i class="icon icon-unlock"></i>
                   </template>
-                  <template slot="append">
-                    <i :class="loginClsaa" @click="loginChangeEyes"></i>
-                  </template>
                 </at-input>
                 <p class="find">忘记密码</p>
+                <template>
+                  <i class="show" @click="loginChangeEyes"></i>
+                </template>
               </div>
               <div class="btn">
-                <at-button type="primary" :disabled="loginBtn">登录</at-button>
+                <at-button type="primary" :disabled="loginBtn" @click="loginIn">
+                  登 录
+                </at-button>
               </div>
             </at-tab-pane>
             <at-tab-pane label="注册账号" name="name2">
               <div class="userTab_rgt">
                 <at-input
                   v-model="userName_rgt"
-                  placeholder="手机号/邮箱/用户名"
+                  placeholder="手机号/邮箱"
                   @blur="cheakRgtUser"
                   :status="status"
                   :icon="statusIcon"
@@ -46,26 +55,30 @@
                   v-model="password_rgt"
                   placeholder="密码"
                   :type="rgtEyes"
+                  :icon="rgtClass"
+                  @blur="cheakRgtPaw"
                 >
                   <template slot="prepend">
                     <i class="icon icon-unlock"></i>
-                  </template>
-                  <template slot="append">
-                    <i :class="rgtClass" @click="rgtChangeEyes"></i>
                   </template>
                 </at-input>
                 <at-input
                   v-model="password_agn_rgt"
                   placeholder="再次输入密码"
                   :type="rgtEyes"
+                  :icon="rgtClass"
+                  @blur="cheakRgtPaw"
                 >
                   <template slot="prepend">
                     <i class="icon icon-unlock"></i>
                   </template>
-                  <template slot="append">
-                    <i :class="rgtClass" @click="rgtChangeEyes"></i>
-                  </template>
                 </at-input>
+                <template>
+                  <i class="show1" @click="rgtChangeEyes"></i>
+                </template>
+                <template>
+                  <i class="show2" @click="rgtChangeEyes"></i>
+                </template>
               </div>
               <div class="btn">
                 <at-button type="primary" :disabled="rgtBtn">注册</at-button>
@@ -82,7 +95,7 @@
 </template>
 
 <script>
-import { checkUser } from "../api/index";
+import { checkUser, loginIn } from "../api/index";
 export default {
   name: "home",
   data() {
@@ -92,6 +105,8 @@ export default {
       password: "",
       loginEyes: "password",
       loginClsaa: "icon icon-eye-off",
+      loginStatus: "",
+      loginIcon:"",
       rgtEyes: "password",
       rgtClass: "icon icon-eye-off",
       loginBtn: true,
@@ -104,6 +119,30 @@ export default {
     };
   },
   components: {},
+  watch: {
+    userName() {
+      if (this.userName != "" && this.password != "") {
+        this.loginBtn = false;
+      } else {
+        this.loginBtn = true;
+      }
+      this.loginStatus = "";
+      this.loginIcon="";
+    },
+    password() {
+      if (this.userName != "" && this.password != "") {
+        this.loginBtn = false;
+      } else {
+        this.loginBtn = true;
+      }
+      this.loginStatus = "";
+      this.loginIcon="";
+    },
+    userName_rgt() {
+      this.status = "";
+      this.statusIcon = "";
+    }
+  },
   mounted() {},
   methods: {
     loginChangeEyes() {
@@ -126,10 +165,42 @@ export default {
         that.rgtClass = "icon icon-eye-off";
       }
     },
+    loginIn() {
+      let that = this;
+      let postData = {
+        user: that.userName,
+        psw: that.password
+      };
+      loginIn(postData).then(res => {
+        if (res.code == 0) {
+          that.$Message.success(res.msg);
+        } else {
+          that.$Message.error(res.message);
+          that.loginBtn = true;
+          that.loginStatus = "error";
+          that.loginIcon="x-circle";
+        }
+      });
+    },
     cheakRgtUser() {
       let that = this;
       if (that.userName_rgt != "") {
-        checkUser().then(res => {
+        if ((/^\d{1,}$/).test(that.userName_rgt) && !(/^1[34578]\d{9}$/).test(that.userName_rgt)) {
+          that.$Message.error('请输入正确的手机号');
+          that.status = "error";
+          that.statusIcon = "x-circle";
+          return;
+        } else
+        if (that.userName_rgt.indexOf('@') > -1 && !(/^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/).test(that.userName_rgt)) {
+          that.status = "error";
+          that.statusIcon = "x-circle";
+          that.$Message.error('请输入正确的邮箱号');
+          return;
+        }
+        let userName = {
+          user:that.userName_rgt
+        }
+        checkUser(userName).then(res => {
           if (res.code == 0) {
             that.status = "success";
             that.statusIcon = "check-circle";
@@ -137,11 +208,23 @@ export default {
           } else {
             that.status = "error";
             that.statusIcon = "x-circle";
+            that.$Message.error(res.message);
           }
         });
       } else {
         that.status = "";
         that.statusIcon = "";
+      }
+    },
+    cheakRgtPaw() {
+      let that = this;
+      var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>《》/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]");
+      if (that.password_rgt != "") {
+        if (that.password_rgt.length < 7) {
+          that.$Message.error('长度不能小于6');
+        } else if (!(/^(?=.*?[a-z)(?=.*>[A-Z])(?=.*?[0-9])[a-zA_Z0-9]{6,10}$/).test(that.password_rgt)) {
+          that.$Message.error('密码必须包含数字和字母且不能包含特殊字符');
+        }
       }
     }
   }
@@ -166,6 +249,7 @@ export default {
     height: 1.1rem;
     margin: auto;
     margin-top: 0.3rem;
+    position: relative;
     .at-input {
       margin-bottom: 0.15rem;
       height: 0.3rem;
@@ -180,15 +264,38 @@ export default {
       cursor: pointer;
       font-size: 0.12rem;
     }
+    .show {
+      width: .22rem;
+      height: .3rem;
+      position: absolute;
+      bottom: 0.35rem;
+      right: 0;
+    }
   }
   .userTab_rgt {
     width: 2.75rem;
     height: 1.4rem;
     margin: auto;
     margin-top: 0.3rem;
+    position: relative;
     .at-input {
       margin-bottom: 0.15rem;
       height: 0.3rem;
+    }
+    .show1,
+    .show2 {
+      width: .22rem;
+      height: .3rem;
+    }
+    .show1 {
+      position: absolute;
+      bottom: 0.2rem;
+      right: 0;
+    }
+    .show2 {
+      position: absolute;
+      bottom: 0.65rem;
+      right: 0;
     }
   }
   .btn {
