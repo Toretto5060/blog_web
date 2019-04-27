@@ -1,95 +1,98 @@
 <template>
-  <div class="col-xs-20 col-sm-12 col-md-10 login">
-    <div class="col-sm-24 col-md-24 inputLogin">
-      <at-card :body-style="{ padding: 0 }">
-        <div>
-          <at-tabs>
-            <at-tab-pane label="账号登录" name="name1">
-              <div class="userTab">
-                <at-input
-                  v-model="userName"
-                  placeholder="手机号/邮箱/用户名"
-                  :status="loginStatus"
-                  :icon="loginIcon"
-                >
-                  <template slot="prepend">
-                    <i class="icon icon-user"></i>
+  <div>
+    <div class="bg"></div>
+    <div class="col-xs-20 col-sm-12 col-md-10 login">
+      <div class="col-sm-24 col-md-24 inputLogin">
+        <at-card :body-style="{ padding: 0 }">
+          <div>
+            <at-tabs>
+              <at-tab-pane label="账号登录" name="name1">
+                <div class="userTab">
+                  <at-input
+                    v-model="userName"
+                    placeholder="手机号/邮箱/用户名"
+                    :status="loginStatus"
+                    :icon="loginIcon"
+                  >
+                    <template slot="prepend">
+                      <i class="icon icon-user"></i>
+                    </template>
+                  </at-input>
+                  <at-input
+                    v-model="password"
+                    placeholder="密码"
+                    :type="loginEyes"
+                    :status="loginStatus"
+                    :icon="loginClsaa"
+                  >
+                    <template slot="prepend">
+                      <i class="icon icon-unlock"></i>
+                    </template>
+                  </at-input>
+                  <p class="find">忘记密码</p>
+                  <template>
+                    <i class="show" @click="loginChangeEyes"></i>
                   </template>
-                </at-input>
-                <at-input
-                  v-model="password"
-                  placeholder="密码"
-                  :type="loginEyes"
-                  :status="loginStatus"
-                  :icon="loginClsaa"
-                >
-                  <template slot="prepend">
-                    <i class="icon icon-unlock"></i>
+                </div>
+                <div class="btn">
+                  <at-button type="primary" :disabled="loginBtn" @click="loginIn">
+                    登 录
+                  </at-button>
+                </div>
+              </at-tab-pane>
+              <at-tab-pane label="注册账号" name="name2">
+                <div class="userTab_rgt">
+                  <at-input
+                    v-model="userName_rgt"
+                    placeholder="手机号/邮箱"
+                    @blur="cheakRgtUser"
+                    :status="status"
+                    :icon="statusIcon"
+                  >
+                    <template slot="prepend">
+                      <i class="icon icon-user"></i>
+                    </template>
+                  </at-input>
+                  <at-input
+                    v-model="password_rgt"
+                    placeholder="密码"
+                    :type="rgtEyes"
+                    :icon="rgtClass"
+                    @blur="cheakRgtPaw"
+                  >
+                    <template slot="prepend">
+                      <i class="icon icon-unlock"></i>
+                    </template>
+                  </at-input>
+                  <at-input
+                    v-model="password_agn_rgt"
+                    placeholder="再次输入密码"
+                    :type="rgtEyes"
+                    :icon="rgtClass"
+                    @blur="cheakRgtPaw"
+                  >
+                    <template slot="prepend">
+                      <i class="icon icon-unlock"></i>
+                    </template>
+                  </at-input>
+                  <template>
+                    <i class="show1" @click="rgtChangeEyes"></i>
                   </template>
-                </at-input>
-                <p class="find">忘记密码</p>
-                <template>
-                  <i class="show" @click="loginChangeEyes"></i>
-                </template>
-              </div>
-              <div class="btn">
-                <at-button type="primary" :disabled="loginBtn" @click="loginIn">
-                  登 录
-                </at-button>
-              </div>
-            </at-tab-pane>
-            <at-tab-pane label="注册账号" name="name2">
-              <div class="userTab_rgt">
-                <at-input
-                  v-model="userName_rgt"
-                  placeholder="手机号/邮箱"
-                  @blur="cheakRgtUser"
-                  :status="status"
-                  :icon="statusIcon"
-                >
-                  <template slot="prepend">
-                    <i class="icon icon-user"></i>
+                  <template>
+                    <i class="show2" @click="rgtChangeEyes"></i>
                   </template>
-                </at-input>
-                <at-input
-                  v-model="password_rgt"
-                  placeholder="密码"
-                  :type="rgtEyes"
-                  :icon="rgtClass"
-                  @blur="cheakRgtPaw"
-                >
-                  <template slot="prepend">
-                    <i class="icon icon-unlock"></i>
-                  </template>
-                </at-input>
-                <at-input
-                  v-model="password_agn_rgt"
-                  placeholder="再次输入密码"
-                  :type="rgtEyes"
-                  :icon="rgtClass"
-                  @blur="cheakRgtPaw"
-                >
-                  <template slot="prepend">
-                    <i class="icon icon-unlock"></i>
-                  </template>
-                </at-input>
-                <template>
-                  <i class="show1" @click="rgtChangeEyes"></i>
-                </template>
-                <template>
-                  <i class="show2" @click="rgtChangeEyes"></i>
-                </template>
-              </div>
-              <div class="btn">
-                <at-button type="primary" :disabled="rgtBtn">注册</at-button>
-              </div>
-            </at-tab-pane>
-          </at-tabs>
-          <div style="padding: 14px;">
-            <p>AT-UI</p>
+                </div>
+                <div class="btn">
+                  <at-button type="primary" :disabled="rgtBtn">注册</at-button>
+                </div>
+              </at-tab-pane>
+            </at-tabs>
+            <div style="padding: 14px;">
+              <p>AT-UI</p>
+            </div>
           </div>
-        </div>
-      </at-card>
+        </at-card>
+      </div>
     </div>
   </div>
 </template>
@@ -230,6 +233,15 @@ export default {
 };
 </script>
 <style lang="less" scoped>
+.bg{
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  background: url('../assets/img/earth.png');
+  background-size: 100% 100%;
+  z-index: -9;
+}
 .login {
   /*width: 100%;*/
   height: 3rem;
@@ -245,6 +257,7 @@ export default {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  z-index: 99999;
   .icon-eye,
   .icon-eye-off {
     cursor: pointer;
