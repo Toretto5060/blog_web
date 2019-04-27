@@ -106,7 +106,7 @@ export default {
       loginEyes: "password",
       loginClsaa: "icon icon-eye-off",
       loginStatus: "",
-      loginIcon:"",
+      loginIcon: "",
       rgtEyes: "password",
       rgtClass: "icon icon-eye-off",
       loginBtn: true,
@@ -127,7 +127,7 @@ export default {
         this.loginBtn = true;
       }
       this.loginStatus = "";
-      this.loginIcon="";
+      this.loginIcon = "";
     },
     password() {
       if (this.userName != "" && this.password != "") {
@@ -136,7 +136,7 @@ export default {
         this.loginBtn = true;
       }
       this.loginStatus = "";
-      this.loginIcon="";
+      this.loginIcon = "";
     },
     userName_rgt() {
       this.status = "";
@@ -178,7 +178,7 @@ export default {
           that.$Message.error(res.message);
           that.loginBtn = true;
           that.loginStatus = "error";
-          that.loginIcon="x-circle";
+          that.loginIcon = "x-circle";
         }
       });
     },
@@ -186,20 +186,19 @@ export default {
       let that = this;
       if (that.userName_rgt != "") {
         if ((/^\d{1,}$/).test(that.userName_rgt) && !(/^1[34578]\d{9}$/).test(that.userName_rgt)) {
-          that.$Message.error('请输入正确的手机号');
+          that.$Message.error("请输入正确的手机号");
           that.status = "error";
           that.statusIcon = "x-circle";
           return;
-        } else
-        if (that.userName_rgt.indexOf('@') > -1 && !(/^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/).test(that.userName_rgt)) {
+        } else if (that.userName_rgt.indexOf('@') > -1 && !(/^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/).test(that.userName_rgt)) {
           that.status = "error";
           that.statusIcon = "x-circle";
-          that.$Message.error('请输入正确的邮箱号');
+          that.$Message.error("请输入正确的邮箱号");
           return;
         }
         let userName = {
-          user:that.userName_rgt
-        }
+          user: that.userName_rgt
+        };
         checkUser(userName).then(res => {
           if (res.code == 0) {
             that.status = "success";
@@ -218,12 +217,12 @@ export default {
     },
     cheakRgtPaw() {
       let that = this;
-      var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>《》/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]");
+      // var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>《》/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]");
       if (that.password_rgt != "") {
         if (that.password_rgt.length < 7) {
-          that.$Message.error('长度不能小于6');
-        } else if (!(/^(?=.*?[a-z)(?=.*>[A-Z])(?=.*?[0-9])[a-zA_Z0-9]{6,10}$/).test(that.password_rgt)) {
-          that.$Message.error('密码必须包含数字和字母且不能包含特殊字符');
+          that.$Message.error("长度不能小于6");
+        } else if (!(/^(?=.*?[a-z)(?=.*>[A-Z])(?=.*?[0-9])[a-zA_Z0-9]{6,10}$/).test(that.password_rgt) ) {
+          that.$Message.error("密码必须包含数字和字母且不能包含特殊字符");
         }
       }
     }
@@ -240,6 +239,12 @@ export default {
   right: 0;
   bottom: 0;
   margin: auto;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   .icon-eye,
   .icon-eye-off {
     cursor: pointer;
@@ -265,8 +270,8 @@ export default {
       font-size: 0.12rem;
     }
     .show {
-      width: .22rem;
-      height: .3rem;
+      width: 0.22rem;
+      height: 0.3rem;
       position: absolute;
       bottom: 0.35rem;
       right: 0;
@@ -284,8 +289,8 @@ export default {
     }
     .show1,
     .show2 {
-      width: .22rem;
-      height: .3rem;
+      width: 0.22rem;
+      height: 0.3rem;
     }
     .show1 {
       position: absolute;
@@ -320,6 +325,12 @@ export default {
         width: 1.25rem;
         text-align: center;
         font-size: 0.14rem;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
       }
     }
   }
