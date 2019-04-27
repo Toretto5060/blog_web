@@ -5,7 +5,7 @@
       <div class="col-sm-24 col-md-24 inputLogin">
         <at-card :body-style="{ padding: 0 }">
           <div>
-            <at-tabs>
+            <at-tabs @on-change="changeTab">
               <at-tab-pane label="账号登录" name="name1">
                 <div class="userTab">
                   <at-input
@@ -163,19 +163,17 @@ export default {
       }
     },
     password_rgt() {
+      if (this.status == "error" && this.password_rgt != "") {
+        this.password_agn_rgt = "";
+        this.$Message.error("请输入正确的手机号或邮箱");
+        this.password_rgt = "";
+        return;
+      }
       if (this.password_rgt != "" && this.userName_rgt == "") {
         this.password_rgt = "";
         this.status = "error";
         this.statusIcon = "x-circle";
         this.$Message.error("请输入手机号或邮箱");
-        return;
-      }
-      if (this.status == "error") {
-        this.password_rgt = "";
-        this.password_agn_rgt = "";
-        this.status = "error";
-        this.statusIcon = "x-circle";
-        this.$Message.error("请输入正确的手机号或邮箱");
         return;
       }
       if (this.password_agn_rgt != "" && this.password_rgt != this.password_agn_rgt) {
@@ -229,6 +227,27 @@ export default {
   },
   mounted() {},
   methods: {
+    changeTab() {
+      let that = this;
+      that.userName = "";
+      that.password = "";
+      that.loginEyes = "password";
+      that.loginClsaa = "icon icon-eye-off";
+      that.loginStatus = "";
+      that.loginIcon = "";
+      that.rgtEyes = "password";
+      that.rgtClass = "icon icon-eye-off";
+      that.loginBtn = true;
+      that.userName_rgt = "";
+      that.userName_rgt_isVerify = false;
+      that.password_rgt = "";
+      that.password_agn_rgt = "";
+      that.rgtBtn = true;
+      that.status = "";
+      that.statusIcon = "";
+      that.password_rgt_status = "";
+      that.password_agn_rgt_status = "";
+    },
     loginChangeEyes() {
       let that = this;
       if (that.loginClsaa == "icon icon-eye-off") {
@@ -270,7 +289,7 @@ export default {
     cheakRgtUser() {
       let that = this;
       if (that.userName_rgt != "") {
-        if ((/^\d{1,}$/).test(that.userName_rgt) && !(/^1[34578]\d{9}$/).test(that.userName_rgt)) {
+        if (that.userName_rgt.indexOf('@') == -1 && !(/^1[34578]\d{9}$/).test(that.userName_rgt)) {
           that.$Message.error("请输入正确的手机号");
           that.status = "error";
           that.statusIcon = "x-circle";
