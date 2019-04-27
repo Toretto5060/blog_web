@@ -35,7 +35,11 @@
                   </template>
                 </div>
                 <div class="btn">
-                  <at-button type="primary" :disabled="loginBtn" @click="loginIn">
+                  <at-button
+                    type="primary"
+                    :disabled="loginBtn"
+                    @click="loginIn"
+                  >
                     登 录
                   </at-button>
                 </div>
@@ -59,6 +63,8 @@
                     :type="rgtEyes"
                     :icon="rgtClass"
                     @blur="cheakRgtPaw"
+                    @focus="cheakRgtPaw"
+                    :status="password_rgt_status"
                   >
                     <template slot="prepend">
                       <i class="icon icon-unlock"></i>
@@ -69,7 +75,9 @@
                     placeholder="再次输入密码"
                     :type="rgtEyes"
                     :icon="rgtClass"
-                    @blur="cheakRgtPaw"
+                    @blur="cheakRgtAgainPaw"
+                    @focus="cheakRgtAgainPaw"
+                    :status="password_agn_rgt_status"
                   >
                     <template slot="prepend">
                       <i class="icon icon-unlock"></i>
@@ -114,11 +122,14 @@ export default {
       rgtClass: "icon icon-eye-off",
       loginBtn: true,
       userName_rgt: "",
+      userName_rgt_isVerify: false,
       password_rgt: "",
       password_agn_rgt: "",
       rgtBtn: true,
       status: "",
-      statusIcon: ""
+      statusIcon: "",
+      password_rgt_status: "",
+      password_agn_rgt_status: ""
     };
   },
   components: {},
@@ -144,6 +155,76 @@ export default {
     userName_rgt() {
       this.status = "";
       this.statusIcon = "";
+      this.userName_rgt_isVerify = false;
+      this.password_rgt = "";
+      this.password_agn_rgt = "";
+      if (this.userName_rgt == "") {
+        this.rgtBtn = true;
+      }
+    },
+    password_rgt() {
+      if (this.password_rgt != "" && this.userName_rgt == "") {
+        this.password_rgt = "";
+        this.status = "error";
+        this.statusIcon = "x-circle";
+        this.$Message.error("请输入手机号或邮箱");
+        return;
+      }
+      if (this.status == "error") {
+        this.password_rgt = "";
+        this.password_agn_rgt = "";
+        this.status = "error";
+        this.statusIcon = "x-circle";
+        this.$Message.error("请输入正确的手机号或邮箱");
+        return;
+      }
+      if (this.password_agn_rgt != "" && this.password_rgt != this.password_agn_rgt) {
+        this.$Message.error("请输入相同的密码");
+        this.password_agn_rgt_status = "error";
+        this.rgtBtn = true;
+      } else if(this.password_agn_rgt != "" && this.password_rgt == this.password_agn_rgt) {
+        this.password_agn_rgt_status = "success";
+        this.rgtBtn = false;
+      }
+      if (this.password_rgt == "") {
+        this.rgtBtn = true;
+      }
+      this.password_rgt_status = "";
+    },
+    password_agn_rgt() {
+      if (this.userName_rgt == "" && this.password_rgt == "" && this.password_agn_rgt != "") {
+        this.password_agn_rgt = "";
+        this.status = "error";
+        this.statusIcon = "x-circle";
+        this.$Message.error("请输入手机号或邮箱");
+        return;
+      }
+      if (this.userName_rgt != "" && this.password_rgt == "" && this.password_agn_rgt != "") {
+        this.password_agn_rgt = "";
+        this.password_rgt_status = "error";
+        this.$Message.error("请先输入密码");
+        return;
+      }
+      if (this.password_rgt_status == "error" && this.password_rgt != "") {
+        this.password_agn_rgt = "";
+        this.$Message.error("请先输入正确的密码");
+        return;
+      }
+      if (this.password_agn_rgt != "") {
+        if (this.password_agn_rgt != this.password_rgt) {
+          this.password_agn_rgt_status = "error";
+          this.rgtBtn = true;
+        } else {
+          this.password_rgt_status = "success";
+          this.password_agn_rgt_status = "success";
+          this.rgtBtn = false;
+        }
+      } else {
+        this.password_agn_rgt_status = "";
+      }
+      if (this.password_agn_rgt == "") {
+        this.rgtBtn = true;
+      }
     }
   },
   mounted() {},
@@ -185,6 +266,7 @@ export default {
         }
       });
     },
+    // 校验注册用户名格式及用户名是否可用
     cheakRgtUser() {
       let that = this;
       if (that.userName_rgt != "") {
@@ -202,43 +284,65 @@ export default {
         let userName = {
           user: that.userName_rgt
         };
-        checkUser(userName).then(res => {
-          if (res.code == 0) {
-            that.status = "success";
-            that.statusIcon = "check-circle";
-            that.$Message.success(res.message);
-          } else {
-            that.status = "error";
-            that.statusIcon = "x-circle";
-            that.$Message.error(res.message);
-          }
-        });
+        if (that.userName_rgt_isVerify == false) {
+          checkUser(userName).then(res => {
+            if (res.code == 0) {
+              that.status = "success";
+              that.statusIcon = "check-circle";
+              that.$Message.success(res.message);
+            } else {
+              that.status = "error";
+              that.statusIcon = "x-circle";
+              that.$Message.error(res.message);
+            }
+            that.userName_rgt_isVerify = true;
+          });
+        }
       } else {
         that.status = "";
         that.statusIcon = "";
       }
     },
+    // 校验注册密码长度及格式
     cheakRgtPaw() {
       let that = this;
+      if (that.userName_rgt == "" && that.password_rgt == "") {
+        if (that.status == "error") {
+          that.status = "";
+          that.statusIcon = "";
+        }
+        return;
+      }
       // var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>《》/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]");
       if (that.password_rgt != "") {
-        if (that.password_rgt.length < 7) {
+        if (that.password_rgt.length < 6) {
+          that.password_rgt_status = "error";
           that.$Message.error("长度不能小于6");
         } else if (!(/^(?=.*?[a-z)(?=.*>[A-Z])(?=.*?[0-9])[a-zA_Z0-9]{6,10}$/).test(that.password_rgt) ) {
+          that.password_rgt_status = "error";
           that.$Message.error("密码必须包含数字和字母且不能包含特殊字符");
         }
+      }
+    },
+    cheakRgtAgainPaw() {
+      let that = this;
+      if (that.password_agn_rgt == "" && that.userName_rgt != "" && that.password_rgt == "") {
+        that.password_rgt_status = "";
+      } else if (that.password_agn_rgt == "" && that.userName_rgt == "" && that.password_rgt == "") {
+        that.status = "";
+        that.password_rgt_status = "";
       }
     }
   }
 };
 </script>
 <style lang="less" scoped>
-.bg{
+.bg {
   width: 100%;
   height: 100%;
   position: absolute;
   top: 0;
-  background: url('../assets/img/earth.png');
+  background: url("../assets/img/earth.png");
   background-size: 100% 100%;
   z-index: -9;
 }
@@ -257,7 +361,6 @@ export default {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  z-index: 99999;
   .icon-eye,
   .icon-eye-off {
     cursor: pointer;
