@@ -72,42 +72,47 @@
                     <at-button
                       :disabled="disabled"
                       @mouseover.native="cheakRgtUser"
+                      @click="getAothCode"
                     >
                       {{ bntText }}
-                  </at-button>
+                    </at-button>
                   </div>
-                  <at-input
-                    v-model="password_rgt"
-                    placeholder="密码"
-                    :type="rgtEyes"
-                    :icon="rgtClass"
-                    @blur="cheakRgtPaw"
-                    @focus="cheakRgtPaw"
-                    :status="password_rgt_status"
-                  >
-                    <template slot="prepend">
-                      <i class="icon icon-unlock"></i>
+                  <div class="inputF1">
+                    <at-input
+                      v-model="password_rgt"
+                      placeholder="密码"
+                      :type="rgtEyes"
+                      :icon="rgtClass"
+                      @blur="cheakRgtPaw"
+                      @focus="cheakRgtPaw"
+                      :status="password_rgt_status"
+                    >
+                      <template slot="prepend">
+                        <i class="icon icon-unlock"></i>
+                      </template>
+                    </at-input>
+                    <template>
+                      <i class="show1" @click="rgtChangeEyes"></i>
                     </template>
-                  </at-input>
-                  <at-input
-                    v-model="password_agn_rgt"
-                    placeholder="再次输入密码"
-                    :type="rgtEyes"
-                    :icon="rgtClass"
-                    @blur="cheakRgtAgainPaw"
-                    @focus="cheakRgtAgainPaw"
-                    :status="password_agn_rgt_status"
-                  >
-                    <template slot="prepend">
-                      <i class="icon icon-unlock"></i>
+                  </div>
+                  <div class="inputF2">
+                    <at-input
+                      v-model="password_agn_rgt"
+                      placeholder="再次输入密码"
+                      :type="rgtEyes"
+                      :icon="rgtClass"
+                      @blur="cheakRgtAgainPaw"
+                      @focus="cheakRgtAgainPaw"
+                      :status="password_agn_rgt_status"
+                    >
+                      <template slot="prepend">
+                        <i class="icon icon-unlock"></i>
+                      </template>
+                    </at-input>
+                    <template>
+                      <i class="show2" @click="rgtChangeEyes"></i>
                     </template>
-                  </at-input>
-                  <template>
-                    <i class="show1" @click="rgtChangeEyes"></i>
-                  </template>
-                  <template>
-                    <i class="show2" @click="rgtChangeEyes"></i>
-                  </template>
+                  </div>
                 </div>
                 <div class="btn">
                   <at-button type="primary" :disabled="rgtBtn">注册</at-button>
@@ -192,7 +197,7 @@ export default {
       ) {
         if (/^1[34578]\d{9}$/.test(this.userName_rgt)) {
           this.authCodeIsShow = true;
-        } 
+        }
       }
       if (this.userName_rgt == "") {
         this.rgtBtn = true;
@@ -262,7 +267,10 @@ export default {
         if (this.password_agn_rgt != this.password_rgt) {
           this.password_agn_rgt_status = "error";
           this.rgtBtn = true;
-        } else if(this.authCode == "" && this.password_agn_rgt == this.password_rgt) {
+        } else if (
+          this.authCode == "" &&
+          this.password_agn_rgt == this.password_rgt
+        ) {
           this.authCodeStatus = "error";
           this.password_rgt_status = "success";
           this.password_agn_rgt_status = "success";
@@ -280,7 +288,7 @@ export default {
     authCode() {
       if (
         this.status != "error" &&
-        this.password_rgt_status != "error" && 
+        this.password_rgt_status != "error" &&
         this.password_agn_rgt_status != "error"
       ) {
         if (this.authCode != "") {
@@ -420,18 +428,14 @@ export default {
         }
         return;
       }
-      // var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>《》/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]");
+      // var pattern = new RegExp(/["'<>%;)(&+]/);
       if (that.password_rgt != "") {
         if (that.password_rgt.length < 6) {
           that.password_rgt_status = "error";
           that.$Message.error("长度不能小于6");
-        } else if (
-          !/^(?=.*?[a-z)(?=.*>[A-Z])(?=.*?[0-9])[a-zA_Z0-9]{6,10}$/.test(
-            that.password_rgt
-          )
-        ) {
+        } else if (!/[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/.test(that.password_rgt)) {
           that.password_rgt_status = "error";
-          that.$Message.error("密码必须包含数字和字母且不能包含特殊字符");
+          that.$Message.error("密码必须包含数字和字母");
         }
       }
     },
@@ -452,6 +456,9 @@ export default {
         that.status = "";
         that.password_rgt_status = "";
       }
+    },
+    getAothCode() {
+      console.log("123");
     }
   }
 };
@@ -523,6 +530,28 @@ export default {
       margin-bottom: 0.15rem;
       height: 0.3rem;
     }
+    .inputF1 {
+      position: relative;
+      .show1 {
+        display: block;
+        width: 0.24rem;
+        height: 0.3rem;
+        position: absolute;
+        top: 0;
+        right: 0;
+      }
+    }
+    .inputF2 {
+      position: relative;
+      .show2 {
+        display: block;
+        width: 0.24rem;
+        height: 0.3rem;
+        position: absolute;
+        top: 0;
+        right: 0;
+      }
+    }
     .authF {
       position: relative;
       .inputAuthCode {
@@ -535,21 +564,6 @@ export default {
         width: 0.8rem;
         height: 0.3rem;
       }
-    }
-    .show1,
-    .show2 {
-      width: 0.22rem;
-      height: 0.3rem;
-    }
-    .show1 {
-      position: absolute;
-      bottom: 0.2rem;
-      right: 0;
-    }
-    .show2 {
-      position: absolute;
-      bottom: 0.65rem;
-      right: 0;
     }
   }
   .btn {
