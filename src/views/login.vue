@@ -176,11 +176,17 @@ export default {
         this.$Message.error("请输入手机号或邮箱");
         return;
       }
-      if (this.password_agn_rgt != "" && this.password_rgt != this.password_agn_rgt) {
+      if (
+        this.password_agn_rgt != "" &&
+        this.password_rgt != this.password_agn_rgt
+      ) {
         this.$Message.error("请输入相同的密码");
         this.password_agn_rgt_status = "error";
         this.rgtBtn = true;
-      } else if(this.password_agn_rgt != "" && this.password_rgt == this.password_agn_rgt) {
+      } else if (
+        this.password_agn_rgt != "" &&
+        this.password_rgt == this.password_agn_rgt
+      ) {
         this.password_agn_rgt_status = "success";
         this.rgtBtn = false;
       }
@@ -190,14 +196,22 @@ export default {
       this.password_rgt_status = "";
     },
     password_agn_rgt() {
-      if (this.userName_rgt == "" && this.password_rgt == "" && this.password_agn_rgt != "") {
+      if (
+        this.userName_rgt == "" &&
+        this.password_rgt == "" &&
+        this.password_agn_rgt != ""
+      ) {
         this.password_agn_rgt = "";
         this.status = "error";
         this.statusIcon = "x-circle";
         this.$Message.error("请输入手机号或邮箱");
         return;
       }
-      if (this.userName_rgt != "" && this.password_rgt == "" && this.password_agn_rgt != "") {
+      if (
+        this.userName_rgt != "" &&
+        this.password_rgt == "" &&
+        this.password_agn_rgt != ""
+      ) {
         this.password_agn_rgt = "";
         this.password_rgt_status = "error";
         this.$Message.error("请先输入密码");
@@ -289,12 +303,20 @@ export default {
     cheakRgtUser() {
       let that = this;
       if (that.userName_rgt != "") {
-        if (that.userName_rgt.indexOf('@') == -1 && !(/^1[34578]\d{9}$/).test(that.userName_rgt)) {
+        if (
+          that.userName_rgt.indexOf("@") == -1 &&
+          !/^1[34578]\d{9}$/.test(that.userName_rgt)
+        ) {
           that.$Message.error("请输入正确的手机号");
           that.status = "error";
           that.statusIcon = "x-circle";
           return;
-        } else if (that.userName_rgt.indexOf('@') > -1 && !(/^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/).test(that.userName_rgt)) {
+        } else if (
+          that.userName_rgt.indexOf("@") > -1 &&
+          !/^([a-zA-Z0-9]+[_||]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_||]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/.test(
+            that.userName_rgt
+          )
+        ) {
           that.status = "error";
           that.statusIcon = "x-circle";
           that.$Message.error("请输入正确的邮箱号");
@@ -337,7 +359,11 @@ export default {
         if (that.password_rgt.length < 6) {
           that.password_rgt_status = "error";
           that.$Message.error("长度不能小于6");
-        } else if (!(/^(?=.*?[a-z)(?=.*>[A-Z])(?=.*?[0-9])[a-zA_Z0-9]{6,10}$/).test(that.password_rgt) ) {
+        } else if (
+          !/^(?=.*?[a-z)(?=.*>[A-Z])(?=.*?[0-9])[a-zA_Z0-9]{6,10}$/.test(
+            that.password_rgt
+          )
+        ) {
           that.password_rgt_status = "error";
           that.$Message.error("密码必须包含数字和字母且不能包含特殊字符");
         }
@@ -345,9 +371,17 @@ export default {
     },
     cheakRgtAgainPaw() {
       let that = this;
-      if (that.password_agn_rgt == "" && that.userName_rgt != "" && that.password_rgt == "") {
+      if (
+        that.password_agn_rgt == "" &&
+        that.userName_rgt != "" &&
+        that.password_rgt == ""
+      ) {
         that.password_rgt_status = "";
-      } else if (that.password_agn_rgt == "" && that.userName_rgt == "" && that.password_rgt == "") {
+      } else if (
+        that.password_agn_rgt == "" &&
+        that.userName_rgt == "" &&
+        that.password_rgt == ""
+      ) {
         that.status = "";
         that.password_rgt_status = "";
       }
