@@ -61,7 +61,7 @@
                     <at-input
                       v-model="authCode"
                       placeholder="请输入验证码"
-                      :maxlength="4"
+                      :maxlength="6"
                       class="inputAuthCode"
                       :status="authCodeStatus"
                     >
@@ -115,7 +115,7 @@
                   </div>
                 </div>
                 <div class="btn">
-                  <at-button type="primary" :disabled="rgtBtn">注册</at-button>
+                  <at-button type="primary" :disabled="rgtBtn" @click="registerIn">注册</at-button>
                 </div>
               </at-tab-pane>
             </at-tabs>
@@ -130,7 +130,7 @@
 </template>
 
 <script>
-import { checkUser, loginIn } from "../api/index";
+import { checkUser, loginIn, aothCode, registerUser} from "../api/index";
 export default {
   name: "home",
   data() {
@@ -160,7 +160,8 @@ export default {
       authCode: "",
       authCodeStatus: "",
       bntText: "获取验证码",
-      disabled: false
+      disabled: false,
+      timer: null
     };
   },
   components: {},
@@ -276,6 +277,7 @@ export default {
           this.password_agn_rgt_status = "success";
           this.rgtBtn = true;
         } else {
+          this.password_agn_rgt_status = "success";
           this.rgtBtn = false;
         }
       } else {
@@ -287,21 +289,33 @@ export default {
     },
     authCode() {
       if (
+        this.authCode != "" &&
         this.status != "error" &&
         this.password_rgt_status != "error" &&
         this.password_agn_rgt_status != "error"
       ) {
-        if (this.authCode != "") {
+        if (
+          this.userName_rgt != "" &&
+          this.password_rgt != "" &&
+          this.password_agn_rgt != ""
+        ) {
           this.authCodeStatus = "success";
           this.rgtBtn = false;
         } else {
-          this.authCodeStatus = "error";
+          this.authCodeStatus = "success";
           this.rgtBtn = true;
         }
+      } else if (this.authCode == "" && this.password_rgt == "" || this.password_agn_rgt == "") {
+        this.authCodeStatus = "";
+      } else if(this.authCode == "" && this.password_rgt != "" || this.password_agn_rgt != "") {
+        this.authCodeStatus = "error";
+        this.rgtBtn = true;
       }
     }
   },
-  mounted() {},
+  mounted() {
+    let that = this; 
+  },
   methods: {
     changeTab(e) {
       let that = this;
@@ -436,6 +450,8 @@ export default {
         } else if (!/[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/.test(that.password_rgt)) {
           that.password_rgt_status = "error";
           that.$Message.error("密码必须包含数字和字母");
+        } else {
+          that.password_rgt_status = "success";
         }
       }
     },
@@ -457,8 +473,47 @@ export default {
         that.password_rgt_status = "";
       }
     },
+    // 获取验证码
     getAothCode() {
-      console.log("123");
+      let that = this;
+      let userName = {
+        user:that.userName_rgt
+      };
+      aothCode(userName).then(res => {
+        if (res.code == 0) {
+          that.$Message.success("验证码已发送，请注意查收!")
+          that.disabled = true;
+          let i = 60;
+          that.timer = setInterval(() => {
+            i -= 1;
+            that.bntText = i + "s";
+            if (i == 0) {
+              that.bntText = "获取验证码";
+              that.disabled = false;
+              clearInterval(that.timer);
+              that.timer = null
+            }
+          },1000)
+        } else {
+          that.$Message.error(res.msg);
+          that.status = "error";
+        }
+      })
+    },
+    // 注册用户
+    registerIn() {
+      let that = this;
+      let postData = {
+        user:that.userName_rgt,
+        psw:that.password_rgt,
+        aothCode:that.authCode
+      };
+      registerUser(postData).then(res => {
+        console.log(res)
+        if (res.code < 0) {
+          that.$Message.error(res.msg)
+        }
+      })
     }
   }
 };

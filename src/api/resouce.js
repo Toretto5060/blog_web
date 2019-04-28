@@ -20,13 +20,13 @@ axios.interceptors.response.use(
     }
   },
   error => {
-    if (error.response.status) {
-      switch (error.response.status) {
-        case 404:
-          break;
-      }
-    }
-    return Promise.reject(error.response);
+    // if (error.response.status) {
+    //   switch (error.response.status) {
+    //     case 404:
+    //       break;
+    //   }
+    // }
+    return Promise.reject(error);
   }
 );
 export default axios;
