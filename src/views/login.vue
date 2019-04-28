@@ -7,7 +7,7 @@
           <div>
             <at-tabs @on-change="changeTab">
               <at-tab-pane label="账号登录" name="name1">
-                <div class="userTab">
+                <div class="userTab" v-if="inputLogin">
                   <at-input
                     v-model="userName"
                     placeholder="手机号/邮箱/用户名"
@@ -45,7 +45,7 @@
                 </div>
               </at-tab-pane>
               <at-tab-pane label="注册账号" name="name2">
-                <div class="userTab_rgt">
+                <div class="userTab_rgt" v-if="inputRgt">
                   <at-input
                     v-model="userName_rgt"
                     placeholder="手机号/邮箱"
@@ -57,6 +57,25 @@
                       <i class="icon icon-user"></i>
                     </template>
                   </at-input>
+                  <div class="authF" v-if="authCodeIsShow">
+                    <at-input
+                      v-model="authCode"
+                      placeholder="请输入验证码"
+                      :maxlength="4"
+                      class="inputAuthCode"
+                      :status="authCodeStatus"
+                    >
+                      <template slot="prepend">
+                        <i class="icon icon-unlock"></i>
+                      </template>
+                    </at-input>
+                    <at-button
+                      :disabled="disabled"
+                      @mouseover.native="cheakRgtUser"
+                    >
+                      {{ bntText }}
+                  </at-button>
+                  </div>
                   <at-input
                     v-model="password_rgt"
                     placeholder="密码"
@@ -129,7 +148,14 @@ export default {
       status: "",
       statusIcon: "",
       password_rgt_status: "",
-      password_agn_rgt_status: ""
+      password_agn_rgt_status: "",
+      inputLogin: true,
+      inputRgt: true,
+      authCodeIsShow: false,
+      authCode: "",
+      authCodeStatus: "",
+      bntText: "获取验证码",
+      disabled: false
     };
   },
   components: {},
@@ -158,6 +184,16 @@ export default {
       this.userName_rgt_isVerify = false;
       this.password_rgt = "";
       this.password_agn_rgt = "";
+      this.authCodeIsShow = false;
+      this.disabled = false;
+      if (
+        this.userName_rgt.length == 11 &&
+        this.userName_rgt.indexOf("@") == -1
+      ) {
+        if (/^1[34578]\d{9}$/.test(this.userName_rgt)) {
+          this.authCodeIsShow = true;
+        } 
+      }
       if (this.userName_rgt == "") {
         this.rgtBtn = true;
       }
@@ -226,9 +262,12 @@ export default {
         if (this.password_agn_rgt != this.password_rgt) {
           this.password_agn_rgt_status = "error";
           this.rgtBtn = true;
-        } else {
+        } else if(this.authCode == "" && this.password_agn_rgt == this.password_rgt) {
+          this.authCodeStatus = "error";
           this.password_rgt_status = "success";
           this.password_agn_rgt_status = "success";
+          this.rgtBtn = true;
+        } else {
           this.rgtBtn = false;
         }
       } else {
@@ -237,11 +276,26 @@ export default {
       if (this.password_agn_rgt == "") {
         this.rgtBtn = true;
       }
+    },
+    authCode() {
+      if (
+        this.status != "error" &&
+        this.password_rgt_status != "error" && 
+        this.password_agn_rgt_status != "error"
+      ) {
+        if (this.authCode != "") {
+          this.authCodeStatus = "success";
+          this.rgtBtn = false;
+        } else {
+          this.authCodeStatus = "error";
+          this.rgtBtn = true;
+        }
+      }
     }
   },
   mounted() {},
   methods: {
-    changeTab() {
+    changeTab(e) {
       let that = this;
       that.userName = "";
       that.password = "";
@@ -261,6 +315,14 @@ export default {
       that.statusIcon = "";
       that.password_rgt_status = "";
       that.password_agn_rgt_status = "";
+      that.authCodeIsShow = false;
+      that.authCode = "";
+      that.authCodeStatus = "";
+      if (e.index == 1) {
+        that.inputRgt = true;
+      } else {
+        that.inputRgt = true;
+      }
     },
     loginChangeEyes() {
       let that = this;
@@ -310,6 +372,7 @@ export default {
           that.$Message.error("请输入正确的手机号");
           that.status = "error";
           that.statusIcon = "x-circle";
+          that.disabled = true;
           return;
         } else if (
           that.userName_rgt.indexOf("@") > -1 &&
@@ -320,6 +383,7 @@ export default {
           that.status = "error";
           that.statusIcon = "x-circle";
           that.$Message.error("请输入正确的邮箱号");
+          that.disabled = true;
           return;
         }
         let userName = {
@@ -331,10 +395,12 @@ export default {
               that.status = "success";
               that.statusIcon = "check-circle";
               that.$Message.success(res.message);
+              that.disabled = false;
             } else {
               that.status = "error";
               that.statusIcon = "x-circle";
               that.$Message.error(res.message);
+              that.disabled = true;
             }
             that.userName_rgt_isVerify = true;
           });
@@ -369,6 +435,7 @@ export default {
         }
       }
     },
+    // 校验再次输入密码相关验证逻辑
     cheakRgtAgainPaw() {
       let that = this;
       if (
@@ -395,7 +462,7 @@ export default {
   height: 100%;
   position: absolute;
   top: 0;
-  background: url("../assets/img/earth.png");
+  // background: url("../assets/img/earth.png");
   background-size: 100% 100%;
   z-index: -9;
 }
@@ -448,13 +515,26 @@ export default {
   }
   .userTab_rgt {
     width: 2.75rem;
-    height: 1.4rem;
+    // height: 1.4rem;
     margin: auto;
     margin-top: 0.3rem;
     position: relative;
     .at-input {
       margin-bottom: 0.15rem;
       height: 0.3rem;
+    }
+    .authF {
+      position: relative;
+      .inputAuthCode {
+        width: 1.8rem;
+      }
+      .at-btn {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 0.8rem;
+        height: 0.3rem;
+      }
     }
     .show1,
     .show2 {
@@ -501,6 +581,20 @@ export default {
         -ms-user-select: none;
         user-select: none;
       }
+    }
+  }
+  .authF {
+    position: relative;
+    .at-btn__text {
+      display: block;
+      width: 0.8rem;
+      height: 0.3rem;
+      text-align: center;
+      line-height: 0.3rem;
+      font-size: 0.12rem;
+      position: absolute;
+      top: 0;
+      left: 0;
     }
   }
 }
