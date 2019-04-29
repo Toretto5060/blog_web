@@ -1,8 +1,14 @@
 import axios from "axios";
 
-axios.defaults.timeout = 5000;
+let axiosIns = axios.create({
+  timeout: 6000,
+  // headers: {
+  //   Authorization: userToken
+  // }
+})
+// axiosIns.defaults.timeout = 5000;
 // http request 请求拦截器
-axios.interceptors.request.use(
+axiosIns.interceptors.request.use(
   config => {
     return config;
   },
@@ -11,7 +17,7 @@ axios.interceptors.request.use(
   }
 );
 // 添加响应拦截器
-axios.interceptors.response.use(
+axiosIns.interceptors.response.use(
   response => {
     if (response.status === 200) {
       return Promise.resolve(response.data);
@@ -29,4 +35,4 @@ axios.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-export default axios;
+export default axiosIns;

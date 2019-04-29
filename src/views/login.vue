@@ -305,17 +305,23 @@ export default {
           this.authCodeStatus = "success";
           this.rgtBtn = true;
         }
-      } else if (this.authCode == "" && this.password_rgt == "" || this.password_agn_rgt == "") {
+      } else if (
+        this.authCode == "" &&
+        this.password_rgt == "" ||
+        this.password_agn_rgt == ""
+      ) {
         this.authCodeStatus = "";
-      } else if(this.authCode == "" && this.password_rgt != "" || this.password_agn_rgt != "") {
+      } else if (
+        this.authCode == "" &&
+        this.password_rgt != "" ||
+        this.password_agn_rgt != ""
+      ) {
         this.authCodeStatus = "error";
         this.rgtBtn = true;
       }
     }
   },
-  mounted() {
-    let that = this; 
-  },
+  mounted() {},
   methods: {
     changeTab(e) {
       let that = this;
@@ -477,11 +483,11 @@ export default {
     getAothCode() {
       let that = this;
       let userName = {
-        user:that.userName_rgt
+        user: that.userName_rgt
       };
       aothCode(userName).then(res => {
         if (res.code == 0) {
-          that.$Message.success("验证码已发送，请注意查收!")
+          that.$Message.success("验证码已发送,请注意查收!");
           that.disabled = true;
           let i = 60;
           that.timer = setInterval(() => {
@@ -491,29 +497,29 @@ export default {
               that.bntText = "获取验证码";
               that.disabled = false;
               clearInterval(that.timer);
-              that.timer = null
+              that.timer = null;
             }
-          },1000)
+          }, 1000);
         } else {
           that.$Message.error(res.msg);
           that.status = "error";
         }
-      })
+      });
     },
     // 注册用户
     registerIn() {
       let that = this;
       let postData = {
-        user:that.userName_rgt,
-        psw:that.password_rgt,
-        aothCode:that.authCode
+        user: that.userName_rgt,
+        psw: that.password_rgt,
+        aothCode: that.authCode
       };
       registerUser(postData).then(res => {
-        console.log(res)
+        console.log(res);
         if (res.code < 0) {
-          that.$Message.error(res.msg)
+          that.$Message.error(res.msg);
         }
-      })
+      });
     }
   }
 };
