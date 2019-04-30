@@ -13,6 +13,8 @@ Vue.use(VueParticles); // 粒子效果
 Vue.config.productionTip = false;
 Vue.prototype.axios = axios;
 
+// this.$Message.error("hahah")
+
 new Vue({
   router,
   store,

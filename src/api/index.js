@@ -1,6 +1,10 @@
 import axios from "./resouce";
 let host = process.env.VUE_APP_BASEURL;
 
+// 验证是否登录
+export const checkLogin = params => {
+  return axios.get("" + host + "checkLogin", params);
+};
 // 检测用户名是否可用
 export const checkUser = params => {
   return axios.post("" + host + "checkUser", params);
@@ -20,7 +24,8 @@ export const loginIn = params => {
 export const tast = params => {
   return axios.get("" + host + "tast", params);
 };
-// 验证是否登录
-export const checkLogin = params => {
-  return axios.get("" + host + "checkLogin", params);
+
+// 获取文章列表
+export const contList = params => {
+  return axios.get("" + host + "list", params);
 };

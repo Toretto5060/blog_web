@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="isShow">
     <div class="bg"></div>
     <div class="col-xs-20 col-sm-12 col-md-10 login">
       <div class="col-sm-24 col-md-24 inputLogin">
@@ -130,12 +130,12 @@
 </template>
 
 <script>
-import { checkUser, loginIn, aothCode, emailAothCode, registerUser} from "../api/index";
+import { checkLogin, checkUser, loginIn, aothCode, emailAothCode, registerUser} from "../api/index";
 export default {
   name: "home",
   data() {
     return {
-      isShow: true,
+      isShow: false,
       userName: "",
       password: "",
       loginEyes: "password",
@@ -328,8 +328,27 @@ export default {
       }
     }
   },
-  mounted() {},
+  mounted() {
+    if (localStorage.getItem("blog_token")) {
+      this.checkLoginIn();
+    } else {
+      this.isShow = true;
+    }
+  },
   methods: {
+    //核验是否已是登录状态，是则回到上级页面
+    checkLoginIn() {
+      checkLogin().then(res => {
+        if (res.code == 0) {
+          this.isShow = false;
+          this.$router.go(-1);
+        } else {
+          this.isShow = true;
+        }
+      }).catch(error => {
+        this.isShow = true;
+      })
+    },
     changeTab(e) {
       let that = this;
       that.userName = "";
@@ -379,6 +398,13 @@ export default {
         that.rgtClass = "icon icon-eye-off";
       }
     },
+    showLoading () {
+      const loading = this.$Message.loading({
+        message: '登录中...',
+        duration: 0
+      })
+      setTimeout(loading, 3000);
+    },
     loginIn() {
       let that = this;
       let postData = {
@@ -387,9 +413,17 @@ export default {
       };
       loginIn(postData).then(res => {
         if (res.code == 0) {
-          that.$Message.success(res.msg);
+          localStorage.setItem("blog_token", res.data.token);
+          that.$store.state.token = res.data.token;
+          // that.$Message.success(res.msg);
+          that.showLoading();
+          let timer = setTimeout(() => {
+            that.$router.push({path: "/"});
+
+          //   that.$router.go(-1);
+          }, 3000)
         } else {
-          that.$Message.error(res.message);
+          that.$Message.error(res.msg);
           that.loginBtn = true;
           that.loginStatus = "error";
           that.loginIcon = "x-circle";
@@ -399,9 +433,6 @@ export default {
     // 校验注册用户名格式及用户名是否可用
     cheakRgtUser() {
       let that = this;
-      that.tabName = "tab1";
-      console.log(that.tabName)
-
       if (that.userName_rgt != "") {
         if (
           that.userName_rgt.indexOf("@") == -1 &&
@@ -432,12 +463,12 @@ export default {
             if (res.code == 0) {
               that.status = "success";
               that.statusIcon = "check-circle";
-              that.$Message.success(res.message);
+              that.$Message.success(res.msg);
               that.disabled = false;
             } else {
               that.status = "error";
               that.statusIcon = "x-circle";
-              that.$Message.error(res.message);
+              that.$Message.error(res.msg);
               that.disabled = true;
             }
             that.userName_rgt_isVerify = true;
@@ -530,7 +561,9 @@ export default {
             that.$Message.error(res.msg);
             that.status = "error";
           }
-        });
+        }).catch(err => {
+          that.$Message.error(err.msg);
+        })
       }
     },
     chearContent () {
@@ -558,7 +591,7 @@ export default {
       };
       registerUser(postData).then(res => {
         if (res.code == 0) {
-          that.$Message.success(res.message);
+          that.$Message.success(res.msg);
           that.chearContent();
         } else {
           that.$Message.error(res.msg);
