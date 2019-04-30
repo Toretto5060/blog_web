@@ -5,8 +5,8 @@
       <div class="col-sm-24 col-md-24 inputLogin">
         <at-card :body-style="{ padding: 0 }">
           <div>
-            <at-tabs @on-change="changeTab">
-              <at-tab-pane label="账号登录" name="name1">
+            <at-tabs @on-change="changeTab" :value="tabName">
+              <at-tab-pane label="账号登录" name="tab1">
                 <div class="userTab" v-if="inputLogin">
                   <at-input
                     v-model="userName"
@@ -44,7 +44,7 @@
                   </at-button>
                 </div>
               </at-tab-pane>
-              <at-tab-pane label="注册账号" name="name2">
+              <at-tab-pane label="注册账号" name="tab2">
                 <div class="userTab_rgt" v-if="inputRgt">
                   <at-input
                     v-model="userName_rgt"
@@ -130,7 +130,7 @@
 </template>
 
 <script>
-import { checkUser, loginIn, aothCode, registerUser} from "../api/index";
+import { checkUser, loginIn, aothCode, emailAothCode, registerUser} from "../api/index";
 export default {
   name: "home",
   data() {
@@ -161,7 +161,8 @@ export default {
       authCodeStatus: "",
       bntText: "获取验证码",
       disabled: false,
-      timer: null
+      timer: null,
+      tabName: "tab1"
     };
   },
   components: {},
@@ -191,12 +192,18 @@ export default {
       this.password_rgt = "";
       this.password_agn_rgt = "";
       this.authCodeIsShow = false;
+      this.authCode = "";
       this.disabled = false;
       if (
-        this.userName_rgt.length == 11 &&
-        this.userName_rgt.indexOf("@") == -1
+        this.userName_rgt.length == 11 ||
+        this.userName_rgt.indexOf("@") > -1
       ) {
         if (/^1[34578]\d{9}$/.test(this.userName_rgt)) {
+          this.authCodeIsShow = true;
+        } else if (/^([a-zA-Z0-9]+[_||]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_||]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/.test(
+            this.userName_rgt
+          )
+        ) {
           this.authCodeIsShow = true;
         }
       }
@@ -392,6 +399,9 @@ export default {
     // 校验注册用户名格式及用户名是否可用
     cheakRgtUser() {
       let that = this;
+      that.tabName = "tab1";
+      console.log(that.tabName)
+
       if (that.userName_rgt != "") {
         if (
           that.userName_rgt.indexOf("@") == -1 &&
@@ -479,32 +489,64 @@ export default {
         that.password_rgt_status = "";
       }
     },
-    // 获取验证码
+    setIntervalBtn () {
+      let that = this;
+      let i = 60;
+      that.timer = setInterval(() => {
+        i -= 1;
+        that.bntText = i + "s";
+        if (i == 0) {
+          that.bntText = "获取验证码";
+          that.disabled = false;
+          clearInterval(that.timer);
+          that.timer = null;
+        }
+      }, 1000);
+    },
+    // 获取手机/邮箱验证码
     getAothCode() {
       let that = this;
       let userName = {
         user: that.userName_rgt
       };
-      aothCode(userName).then(res => {
-        if (res.code == 0) {
-          that.$Message.success("验证码已发送,请注意查收!");
-          that.disabled = true;
-          let i = 60;
-          that.timer = setInterval(() => {
-            i -= 1;
-            that.bntText = i + "s";
-            if (i == 0) {
-              that.bntText = "获取验证码";
-              that.disabled = false;
-              clearInterval(that.timer);
-              that.timer = null;
-            }
-          }, 1000);
-        } else {
-          that.$Message.error(res.msg);
-          that.status = "error";
-        }
-      });
+      if (that.userName_rgt.indexOf("@") > -1) {
+        emailAothCode(userName).then(res => {
+          if (res.code == 0) {
+            that.$Message.success(res.msg);
+            that.disabled = true;
+            that.setIntervalBtn();
+          } else {
+            that.$Message.error(res.msg);
+            that.status = "error";
+          }
+        });
+      } else {
+        aothCode(userName).then(res => {
+          if (res.code == 0) {
+            that.$Message.success(res.msg);
+            that.disabled = true;
+            that.setIntervalBtn();
+          } else {
+            that.$Message.error(res.msg);
+            that.status = "error";
+          }
+        });
+      }
+    },
+    chearContent () {
+      let that = this;
+      that.status = "";
+      that.statusIcon = "";
+      that.userName_rgt_isVerify = false;
+      that.userName_rgt = ""
+      that.password_rgt = "";
+      that.password_agn_rgt = "";
+      that.authCodeIsShow = false;
+      that.authCode = "";
+      that.disabled = true;
+      that.bntText = "获取验证码";
+      clearInterval(that.timer);
+      that.timer = null;
     },
     // 注册用户
     registerIn() {
@@ -515,9 +557,13 @@ export default {
         aothCode: that.authCode
       };
       registerUser(postData).then(res => {
-        console.log(res);
-        if (res.code < 0) {
+        if (res.code == 0) {
+          that.$Message.success(res.message);
+          that.chearContent();
+        } else {
           that.$Message.error(res.msg);
+          that.authCodeStatus = "error";
+          that.rgtBtn = true;
         }
       });
     }
