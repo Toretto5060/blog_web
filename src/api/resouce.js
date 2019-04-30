@@ -6,7 +6,7 @@ import store from "../store";
 let axiosIns = axios.create({
   timeout: 6000,
   headers: {
-    blog_token: localStorage.getItem("blog_token") ? localStorage.getItem("blog_token")
+    blog_token: localStorage.getItem("blog_token") ? localStorage.getItem("blog_token") : ""
   }
 })
 // axiosIns.defaults.timeout = 5000;
@@ -35,7 +35,6 @@ axiosIns.interceptors.response.use(
       switch (error.response.status) {
         case 401:
         router.push({path:"/login"});
-        this.$Message.error(error.response.data.msg)
         break;
       }
     } else {

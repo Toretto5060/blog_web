@@ -13,10 +13,17 @@ export const checkUser = params => {
 export const aothCode = params => {
   return axios.post("" + host + "aothCode", params);
 };
+
+// 获取邮箱验证码
+export const emailAothCode = params => {
+  return axios.post("" + host + "emailAothCode", params);
+};
+
 // 注册用户
 export const registerUser = params => {
   return axios.post("" + host + "register", params);
 };
+
 // 用户登录
 export const loginIn = params => {
   return axios.post("" + host + "login", params);

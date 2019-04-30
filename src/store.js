@@ -4,10 +4,10 @@ import Vuex from "vuex";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-  state: {
-  	user_id: "",
-  	token:''
-  },
-  mutations: {},
-  actions: {}
+state: {
+	user_id: "",
+	token: ""
+},
+mutations: {},
+actions: {}
 });

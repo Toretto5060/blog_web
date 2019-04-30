@@ -193,7 +193,7 @@ export default {
       this.password_agn_rgt = "";
       this.authCodeIsShow = false;
       this.authCode = "";
-      this.disabled = false;
+      // this.disabled = false;
       if (
         this.userName_rgt.length == 11 ||
         this.userName_rgt.indexOf("@") > -1
