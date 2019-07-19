@@ -2,7 +2,7 @@
   <div v-if="isShow">
     <div class="bg"></div>
     <div class="col-xs-20 col-sm-12 col-md-10 login">
-      <div class="col-sm-24 col-md-24 inputLogin">
+      <div class="col-sm-12 col-md-24 inputLogin">
         <at-card :body-style="{ padding: 0 }">
           <div>
             <at-tabs @on-change="changeTab" :value="tabName">
@@ -162,7 +162,8 @@ export default {
       bntText: "获取验证码",
       disabled: false,
       timer: null,
-      tabName: "tab1"
+      tabName: "tab1",
+      loading:''
     };
   },
   components: {},
@@ -338,16 +339,19 @@ export default {
   methods: {
     //核验是否已是登录状态，是则回到上级页面
     checkLoginIn() {
-      checkLogin().then(res => {
-        if (res.code == 0) {
-          this.isShow = false;
-          this.$router.go(-1);
-        } else {
+      checkLogin()
+        .then(res => {
+          if (res.code == 0) {
+            this.isShow = false;
+            this.$router.go(-1);
+          } else {
+            this.isShow = false;
+          }
+        })
+        .catch(error => {
           this.isShow = true;
-        }
-      }).catch(error => {
-        this.isShow = true;
-      })
+          // console.log(error);
+        });
     },
     changeTab(e) {
       let that = this;
@@ -398,12 +402,12 @@ export default {
         that.rgtClass = "icon icon-eye-off";
       }
     },
-    showLoading () {
-      const loading = this.$Message.loading({
-        message: '登录中...',
+    showLoading() {
+      this.loading = this.$Message.loading({
+        message: "登录中...",
         duration: 0
-      })
-      setTimeout(loading, 3000);
+      });
+      setTimeout(this.loading, 30000);
     },
     loginIn() {
       let that = this;
@@ -411,18 +415,18 @@ export default {
         user: that.userName,
         psw: that.password
       };
+      that.showLoading();
       loginIn(postData).then(res => {
         if (res.code == 0) {
-          localStorage.setItem("blog_token", res.data.token);
+          console.log(res)
+          that.loading(false)
+          // that.showLoading();
           that.$store.state.token = res.data.token;
-          // that.$Message.success(res.msg);
-          that.showLoading();
-          let timer = setTimeout(() => {
-            that.$router.push({path: "/"});
-
-          //   that.$router.go(-1);
-          }, 3000)
+          localStorage.setItem("blog_token", that.$store.state.token);
+          that.$Message.success(res.msg);
+          that.$router.push({ path: "/" });
         } else {
+          that.loading(false)
           that.$Message.error(res.msg);
           that.loginBtn = true;
           that.loginStatus = "error";
@@ -520,7 +524,7 @@ export default {
         that.password_rgt_status = "";
       }
     },
-    setIntervalBtn () {
+    setIntervalBtn() {
       let that = this;
       let i = 60;
       that.timer = setInterval(() => {
@@ -552,26 +556,29 @@ export default {
           }
         });
       } else {
-        aothCode(userName).then(res => {
-          if (res.code == 0) {
-            that.$Message.success(res.msg);
-            that.disabled = true;
-            that.setIntervalBtn();
-          } else {
-            that.$Message.error(res.msg);
-            that.status = "error";
-          }
-        }).catch(err => {
-          that.$Message.error(err.msg);
-        })
+        aothCode(userName)
+          .then(res => {
+            if (res.code == 0) {
+              that.$Message.success(res.msg);
+              that.disabled = true;
+              that.setIntervalBtn();
+            } else {
+              that.$Message.error(res.msg);
+              that.status = "error";
+            }
+          })
+          .catch(err => {
+            that.$Message.error(err.msg);
+          });
       }
     },
-    chearContent () {
+    // 清空注册面板
+    chearContent() {
       let that = this;
       that.status = "";
       that.statusIcon = "";
       that.userName_rgt_isVerify = false;
-      that.userName_rgt = ""
+      that.userName_rgt = "";
       that.password_rgt = "";
       that.password_agn_rgt = "";
       that.authCodeIsShow = false;
@@ -589,10 +596,16 @@ export default {
         psw: that.password_rgt,
         aothCode: that.authCode
       };
+      that.showLoading();
       registerUser(postData).then(res => {
         if (res.code == 0) {
           that.$Message.success(res.msg);
           that.chearContent();
+          that.loading(false)
+          // that.showLoading();
+          that.$store.state.token = res.data.token;
+          localStorage.setItem("blog_token", that.$store.state.token);
+          that.$router.push({ path: "/" });
         } else {
           that.$Message.error(res.msg);
           that.authCodeStatus = "error";
@@ -725,7 +738,7 @@ export default {
       margin: auto;
       padding-top: 0.2rem;
       .at-tabs-nav__item {
-        width: 1.25rem;
+        width: 1.24rem;
         text-align: center;
         font-size: 0.14rem;
         -webkit-touch-callout: none;
